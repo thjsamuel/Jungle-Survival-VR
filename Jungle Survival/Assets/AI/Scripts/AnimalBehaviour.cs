@@ -7,14 +7,12 @@ using UnityEngine;
 [RAINSerializableClass]
 public class AnimalBehaviour : CustomAIElement
 {
-    private float close_distance; // Threshold for how close bear can react to player
     public GameObject player;
 
     public override void AIInit()
     {
         base.AIInit();
         // This is equivilent to an Awake call
-        close_distance = 5;
     }
 
     public override void Pre()
@@ -58,9 +56,9 @@ public class AnimalBehaviour : CustomAIElement
     /// A simple distance check to see if the AI is close enough to player
     /// </summary>
     /// <returns>true if close enough</returns>
-    public bool checkCloseEnough()
+    public bool checkCloseEnough(float dist)
     {
-        if (Vector3.Distance(AI.Body.transform.position, player.transform.position) < close_distance)
+        if (Vector3.Distance(AI.Body.transform.position, player.transform.position) < dist)
             return true;
         return false;
     }
@@ -72,7 +70,8 @@ public class AnimalBehaviour : CustomAIElement
     /// <returns>true if it is obstructed</returns>
     public bool aiViewOfPlayer(string sensorname)
     {
-        Vector3 direction = (player.transform.position - (AI.Body.transform.position + AI.Body.transform.up)).normalized;
+        Vector3 sensorPos = ((RAIN.Perception.Sensors.VisualSensor)AI.Senses.GetSensor(sensorname)).Position;
+        Vector3 direction = (player.transform.position - sensorPos).normalized;
         RaycastHit rayinfo;
         if (Physics.Raycast(AI.Body.transform.position + AI.Body.transform.up, direction, out rayinfo, ((RAIN.Perception.Sensors.VisualSensor)AI.Senses.GetSensor(sensorname)).Range))
         {
@@ -85,7 +84,7 @@ public class AnimalBehaviour : CustomAIElement
         {
             return false;
         }
-        //Debug.DrawRay((AI.Body.transform.position + AI.Body.transform.up), direction * close_distance, Color.red, 100);
+        Debug.DrawRay(sensorPos, direction, Color.red, 100);
 
         return true;
     }

@@ -27,33 +27,42 @@ public class VRAIUtilityLib : RAINDecision
         {
             if (m_animalRef.aiViewOfPlayer("TigerEyeSight"))
             {
-                if (ai.WorkingMemory.GetItem<bool>("isPlayerBlocked") == true)
-                {
-                    ai.WorkingMemory.SetItem("isPlayerBlocked", false);
 
-                }
-                if (m_animalRef.checkCloseEnough())
+                if (!m_animalRef.checkCloseEnough(5))
                 {
-                    if (ai.WorkingMemory.GetItem<bool>("CanAttackPlayer") != true)
-                        ai.WorkingMemory.SetItem("CanAttackPlayer", true);
+                    if (ai.WorkingMemory.GetItem<bool>("CanStarePlayer") != true)
+                        ai.WorkingMemory.SetItem("CanStarePlayer", true);
                     tResult = ActionResult.SUCCESS;
                 }
+                else if (ai.WorkingMemory.GetItem<bool>("CanStarePlayer") == true) ai.WorkingMemory.SetItem("CanStarePlayer", false);
             }
             else if (ai.WorkingMemory.GetItem<bool>("isPlayerBlocked") != true)
             {
                 ai.WorkingMemory.SetItem("isPlayerBlocked", true);
             }
         }
-            /*
-        else
+        else if (ai.WorkingMemory.GetItem<bool>("isPlayerBlocked") == true)
         {
-            if (ai.WorkingMemory.GetItem<bool>("CanAttackPlayer") != true)
-            {
-                ai.WorkingMemory.SetItem("CanAttackPlayer", false);
-                tResult = ActionResult.FAILURE;
-            }
+            ai.WorkingMemory.SetItem("isPlayerBlocked", false);
         }
-             * */
+        /*
+    else
+    {
+        if (ai.WorkingMemory.GetItem<bool>("CanAttackPlayer") != true)
+        {
+            ai.WorkingMemory.SetItem("CanAttackPlayer", false);
+            tResult = ActionResult.FAILURE;
+        }
+    }
+             
+        if (m_animalRef.checkCloseEnough(5))
+            {
+                if (ai.WorkingMemory.GetItem<bool>("CanAttackPlayer") != true)
+                    ai.WorkingMemory.SetItem("CanAttackPlayer", true);
+                tResult = ActionResult.SUCCESS;
+            }
+            else if (ai.WorkingMemory.GetItem<bool>("CanAttackPlayer") == true) ai.WorkingMemory.SetItem("CanAttackPlayer", false);
+         * * */
 
         return tResult;
     }

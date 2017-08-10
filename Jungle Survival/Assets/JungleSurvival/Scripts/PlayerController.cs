@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
     public static PlayerController instance = null;
     public CharacterController pc;
+    public bool isStaringAtSomething;
 
     void Awake()
     {
@@ -19,10 +20,16 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         pc = gameObject.AddComponent<CharacterController>();
+        isStaringAtSomething = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+    public void ResetStaring()
+    {
+        isStaringAtSomething = false;
+    }
 }

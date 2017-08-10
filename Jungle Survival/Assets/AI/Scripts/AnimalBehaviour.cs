@@ -60,6 +60,7 @@ public class AnimalBehaviour : CustomAIElement
     {
         if (Vector3.Distance(AI.Body.transform.position, player.transform.position) < dist)
             return true;
+
         return false;
     }
 

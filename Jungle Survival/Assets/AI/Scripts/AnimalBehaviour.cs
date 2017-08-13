@@ -8,11 +8,28 @@ using UnityEngine;
 public class AnimalBehaviour : CustomAIElement
 {
     public GameObject player;
+    public StaringBehaviour stare_behaviour;
+    public Timer countToAttack;
+
+    public enum ANIMAL_STATE
+    {
+        IDLE,
+        INVESTIGATE,
+        STARE,
+        RUN,
+        ATTACK
+    }
+
+    public ANIMAL_STATE its_state;
 
     public override void AIInit()
     {
         base.AIInit();
         // This is equivilent to an Awake call
+        stare_behaviour = AI.Body.GetComponent<StaringBehaviour>();
+        its_state = ANIMAL_STATE.IDLE;
+        countToAttack = AI.Body.AddComponent<Timer>();
+        countToAttack.initTimer(5);
     }
 
     public override void Pre()
@@ -74,9 +91,10 @@ public class AnimalBehaviour : CustomAIElement
         Vector3 sensorPos = ((RAIN.Perception.Sensors.VisualSensor)AI.Senses.GetSensor(sensorname)).Position;
         Vector3 direction = (player.transform.position - sensorPos).normalized;
         RaycastHit rayinfo;
-        if (Physics.Raycast(AI.Body.transform.position + AI.Body.transform.up, direction, out rayinfo, ((RAIN.Perception.Sensors.VisualSensor)AI.Senses.GetSensor(sensorname)).Range))
+        //LayerMask mask = 1 << 11;
+        if (Physics.Raycast(sensorPos, direction, out rayinfo, ((RAIN.Perception.Sensors.VisualSensor)AI.Senses.GetSensor(sensorname)).Range /*, mask*/))
         {
-            if (rayinfo.collider.gameObject.layer >= 8) // anything after OpaqueView is basically something that blocks ai sight
+            if (rayinfo.collider.gameObject.layer >= 11) // anything after OpaqueView is basically something that blocks ai sight
             {
                 return false;
             }
@@ -85,7 +103,7 @@ public class AnimalBehaviour : CustomAIElement
         {
             return false;
         }
-        Debug.DrawRay(sensorPos, direction, Color.red, 100);
+        //Debug.DrawRay(sensorPos, direction, Color.red, 100);
 
         return true;
     }

@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour {
     public static PlayerController instance = null;
     public CharacterController pc;
     public bool isStaringAtSomething;
-
     void Awake()
     {
         if (instance == null)
@@ -25,11 +24,12 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+	    
 	}
 
     public void ResetStaring()
     {
-        isStaringAtSomething = false;
+        isStaringAtSomething = false; 
+        //cooldown.startTiming();	
     }
 }

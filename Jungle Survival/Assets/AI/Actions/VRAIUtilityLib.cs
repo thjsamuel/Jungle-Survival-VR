@@ -24,7 +24,7 @@ public class VRAIUtilityLib : RAINDecision
         ActionResult tResult = ActionResult.FAILURE;
         if (ai.WorkingMemory.GetItem<GameObject>("playerRef") != null) // if tiger gains sight of player, therefore not null
         {
-            if (m_animalRef.aiViewOfPlayer("TigerEyeSight")) // if tiger's sight is not blocked by me
+            if (m_animalRef.aiViewOfPlayer("EyeSight")) // if tiger's sight is not blocked by me
             {
                 tResult = ActionResult.SUCCESS; // If animal basically has the player in sight and is not blocked, it has succeeded in seeing the player
                 //if ()
@@ -78,6 +78,11 @@ public class VRAIUtilityLib : RAINDecision
                             ai.WorkingMemory.SetItem("CanAttackPlayer", true);
                         m_animalRef.its_state = AnimalBehaviour.ANIMAL_STATE.RUN;
                     }
+                    //else
+                    //{
+                    //    if (ai.WorkingMemory.GetItem<bool>("CanAttackPlayer") == true)
+                    //        ai.WorkingMemory.SetItem("CanAttackPlayer", false);
+                    //}
                 }
                 break;
             case AnimalBehaviour.ANIMAL_STATE.STARE:

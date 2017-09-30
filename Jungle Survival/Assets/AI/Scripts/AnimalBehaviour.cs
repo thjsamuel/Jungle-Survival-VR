@@ -10,10 +10,13 @@ public class AnimalBehaviour : CustomAIElement
     public GameObject player;
     public StaringBehaviour stare_behaviour;
     public Timer countToAttack;
+    public float m_stareDistance;
+    public static RAIN.Core.AI airef;
 
     public enum ANIMAL_STATE
     {
         IDLE,
+        PATROL,
         INVESTIGATE,
         STARE,
         RUN,
@@ -27,9 +30,11 @@ public class AnimalBehaviour : CustomAIElement
         base.AIInit();
         // This is equivilent to an Awake call
         stare_behaviour = AI.Body.GetComponent<StaringBehaviour>();
-        its_state = ANIMAL_STATE.IDLE;
+        its_state = ANIMAL_STATE.PATROL;
         countToAttack = AI.Body.AddComponent<Timer>();
         countToAttack.initTimer(5);
+        m_stareDistance = 10;
+        airef = AI;
     }
 
     public override void Pre()
@@ -82,6 +87,18 @@ public class AnimalBehaviour : CustomAIElement
     }
 
     /// <summary>
+    /// A simple distance check to see if the AI is close enough to specified position
+    /// </summary>
+    /// <returns>true if close enough</returns>
+    public bool checkCloseEnough(float dist, Vector3 checkpos)
+    {
+        if (Vector3.Distance(AI.Body.transform.position, checkpos) < dist)
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
     /// Is the AI's view of player being obstructed by an object?
     /// Called when AI has sighted player behind wall
     /// </summary>
@@ -90,6 +107,7 @@ public class AnimalBehaviour : CustomAIElement
     {
         Vector3 sensorPos = ((RAIN.Perception.Sensors.VisualSensor)AI.Senses.GetSensor(sensorname)).Position;
         Vector3 direction = (player.transform.position - sensorPos).normalized;
+        //Vector3 direction = (AI.WorkingMemory.GetItem<Vector3>("lastSeenPos") - sensorPos).normalized;
         RaycastHit rayinfo;
         //LayerMask mask = 1 << 11;
         if (Physics.Raycast(sensorPos, direction, out rayinfo, ((RAIN.Perception.Sensors.VisualSensor)AI.Senses.GetSensor(sensorname)).Range /*, mask*/))

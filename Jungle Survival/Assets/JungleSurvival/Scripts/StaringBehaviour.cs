@@ -33,4 +33,9 @@ public class StaringBehaviour : MonoBehaviour, IGvrPointerHoverHandler {
         countToReset.startTiming();
         PlayerController.instance.isStaringAtSomething = true;
     }
+
+    public void finishAnim(string animname)
+    {
+        AnimalBehaviour.airef.WorkingMemory.SetItem("animState", animname);
+    }
 }

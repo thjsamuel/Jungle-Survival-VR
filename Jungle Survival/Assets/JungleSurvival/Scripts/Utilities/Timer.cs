@@ -71,4 +71,8 @@ public class Timer : MonoBehaviour{
         StopCoroutine(StartCR());
     }
 
+    public void resetTimer()
+    {
+        runAction = false;
+    }
 }

@@ -25,7 +25,7 @@ public class Player : MonoBehaviour {
 
     bool is_peeking;
     bool is_originalHeadPos;
-    int rotated;
+    public int rotated;
     float lean_threshold;
     bool walking;
     Vector3 origin;
@@ -34,8 +34,8 @@ public class Player : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         go_head = transform.parent.gameObject;
-        move_speed = 3.0f;
-        original_speed = 3.0f;
+        move_speed = 8.0f;
+        original_speed = 8.0f;
         vec_lookAt = origin = go_head.transform.position;
         walking = false;
         rotated = 0;
@@ -71,7 +71,7 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         // If distance between head and destination is too little, don't move, if too much dist, move to destination
-        if ((Vector3.Distance(go_head.transform.position, vec_lookAt) > move_speed * Time.deltaTime) && is_originalHeadPos)
+        /*if ((Vector3.Distance(go_head.transform.position, vec_lookAt) > move_speed * Time.deltaTime) && is_originalHeadPos)
         {
             walk(move_speed);
             walking = true;
@@ -83,16 +83,17 @@ public class Player : MonoBehaviour {
             walking = false;
         }
 
-        //ALLInputManager.instance.CheckifDeviceTilt();
+        //ALLInputManager.instance.CheckifDeviceTilt();*/
 
         // if the head tilt is more than to one side, then player is peeking and lean position needs to be set to the side of the head
+        // main camera is more/less than threshold value
         if (WrapAngle(transform.rotation.eulerAngles.z) <= -lean_threshold && rotated < 3 && !walking)
         {
-            Debug.Log("right");
+            //Debug.Log("right");
             rotated++;
             if (rotated == 1)
             {
-                origin = vec_lookAt;
+                //origin = vec_lookAt;
                 lean_pos = transform.GetChild(1).transform.position;
                 is_peeking = true;
                 is_originalHeadPos = false;
@@ -100,18 +101,19 @@ public class Player : MonoBehaviour {
         }
         else if (WrapAngle(transform.rotation.eulerAngles.z) >= lean_threshold && rotated > -3 && !walking)
         {
-            Debug.Log("left");
+            //Debug.Log("left");
             rotated--;
             if (rotated == -1)
             {
-                origin = vec_lookAt;
+                //origin = vec_lookAt;
                 lean_pos = transform.GetChild(2).transform.position;
                 is_peeking = true;
                 is_originalHeadPos = false;
-                go_head.transform.position = vec_lookAt;
+                go_head.transform.position = origin;
             }
         }
 
+        // HEAD ROTATION RESET
         // if head is not rotated enough and the player is not walking, reset head position and for next tilting, and therefore player is no longer peeking
         else if ((WrapAngle(transform.rotation.eulerAngles.z) < lean_threshold && WrapAngle(transform.rotation.eulerAngles.z) > -lean_threshold) && !walking)
         {
@@ -123,7 +125,8 @@ public class Player : MonoBehaviour {
             //}
             //else
             //    go_head.transform.position = origin;
-                go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, vec_lookAt, 5 * Time.deltaTime);
+
+                go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, origin, 5 * Time.deltaTime);
                 if ((Vector3.Distance(origin, go_head.transform.position) < ((ALLInputManager.instance.GetDeviceRotation() + 1) * Time.deltaTime)) && is_peeking)
                 {
                     is_originalHeadPos = true;
@@ -131,7 +134,7 @@ public class Player : MonoBehaviour {
                 }
         }
     
-        // if player is currently rotating his head and the leaning is not WAY too far away from the neck origin position, allow leaning
+        // if player is currently rotating his head and the leaning is not too far away from the neck origin position, allow leaning
         if (is_peeking && Vector3.Distance(go_head.transform.position, origin) < 1)
         {
             go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, lean_pos, (ALLInputManager.instance.GetDeviceRotation() + 1) * Time.deltaTime); // can replaace 2 with input.acc.x

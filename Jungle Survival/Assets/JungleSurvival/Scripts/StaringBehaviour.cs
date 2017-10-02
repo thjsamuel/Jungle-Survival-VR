@@ -18,10 +18,10 @@ public class StaringBehaviour : MonoBehaviour, IGvrPointerHoverHandler {
 	void Update () {
         if (spotted)
         {
-            if (countToReset.runAction)
+            if (countToReset.u_runAction)
             {
                 spotted = false;
-                countToReset.runAction = false;
+                countToReset.u_runAction = false;
             }
         }
 

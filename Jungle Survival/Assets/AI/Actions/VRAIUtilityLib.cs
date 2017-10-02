@@ -90,13 +90,13 @@ public class VRAIUtilityLib : RAINDecision
                     if (!PlayerController.instance.isStaringAtSomething)
                     {
                         m_animalRef.countToAttack.startTimingNoRefresh();
-                        if (m_animalRef.countToAttack.runAction)
+                        if (m_animalRef.countToAttack.u_runAction)
                         {
                             if (ai.WorkingMemory.GetItem<bool>("CanAttackPlayer") == false)
                                 ai.WorkingMemory.SetItem("CanAttackPlayer", true);
                             m_animalRef.its_state = AnimalBehaviour.ANIMAL_STATE.RUN;
 
-                            m_animalRef.countToAttack.runAction = false;
+                            m_animalRef.countToAttack.u_runAction = false;
                         }
                     }
                     /*if (!PlayerController.instance.isStaringAtSomething)

@@ -127,7 +127,7 @@ public class Player : MonoBehaviour {
             //    go_head.transform.position = origin;
 
                 go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, origin, 5 * Time.deltaTime);
-                if ((Vector3.Distance(origin, go_head.transform.position) < ((ALLInputManager.instance.GetDeviceRotation() + 1) * Time.deltaTime)) && is_peeking)
+                if ((Vector3.Distance(origin, go_head.transform.position) < ((ALLInputManager.instance.GetDeviceRotation() + 3) * Time.deltaTime)) && is_peeking)
                 {
                     is_originalHeadPos = true;
                     is_peeking = false;
@@ -137,7 +137,7 @@ public class Player : MonoBehaviour {
         // if player is currently rotating his head and the leaning is not too far away from the neck origin position, allow leaning
         if (is_peeking && Vector3.Distance(go_head.transform.position, origin) < 1)
         {
-            go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, lean_pos, (ALLInputManager.instance.GetDeviceRotation() + 1) * Time.deltaTime); // can replaace 2 with input.acc.x
+            go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, lean_pos, (ALLInputManager.instance.GetDeviceRotation() + 3) * Time.deltaTime); // can replaace 2 with input.acc.x
         }
 
 	}

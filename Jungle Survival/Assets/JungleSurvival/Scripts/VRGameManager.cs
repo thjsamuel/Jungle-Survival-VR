@@ -16,6 +16,14 @@ public class VRGameManager : MonoBehaviour {
     public Text t_instruct;
     public Text t_feedback;
 
+    public enum EGAMEMODES
+    {
+        E_GUESSGAME,
+        E_PUNCHOUTGAME,
+        E_DEATH
+    }
+    public EGAMEMODES game_mode;
+
     void Awake()
     {
         if (instance == null)
@@ -32,23 +40,19 @@ public class VRGameManager : MonoBehaviour {
         nextRoundTimer.initTimer(3);
         chooseDuration = gameObject.AddComponent<Timer>();
         chooseDuration.initTimer(5);
-        chosenSide = -1;
+        chosenSide = 0;
+        game_mode = EGAMEMODES.E_PUNCHOUTGAME;
 	}
 	
 	// Update is called once per frame
 	void Update () {
         /// First execution ///
-        if (!roundStarted)
-        {
-            nextRoundTimer.startTimingNoRefresh();
-            if (nextRoundTimer.runAction)
-            {
-                roundStarted = true;
-                t_feedback.text = "Round Starting! Click panel to join.";
-            }
-        }
+        switch (game_mode)
+        { 
+            case EGAMEMODES.E_GUESSGAME:
+               startGame("Round Starting! Click panel to join.");
         /// 3rd execution ///
-        if (chooseDuration.runAction)
+        if (chooseDuration.u_runAction)
         {
             Debug.Log("on");
             int randVal = Random.Range(0, 100);
@@ -76,8 +80,82 @@ public class VRGameManager : MonoBehaviour {
         }
         else
         {
-            t_instruct.text = chooseDuration.secondsPassed.ToString();
+            t_instruct.text = chooseDuration.u_secondsPassed.ToString();
         }
+        break;
+            case EGAMEMODES.E_PUNCHOUTGAME:
+        /// 3rd execution ///
+        if (!roundStarted)
+        {
+            startGame("Round Can Start. Click panel to join!");
+        }
+        if (chooseDuration.u_runAction)
+        {
+            if (chosenSide == 0)
+            {
+                PlayerController.instance.restoreMaxHealth();
+
+                int randVal = Random.Range(0, 100);
+                if (randVal <= 49)
+                {
+                    chosenSide = 1;
+                }
+                else
+                    chosenSide = -1;
+            }
+
+            if (Mathf.Sign(chosenSide) == 1)
+            {
+                EnemyBehaviour enemy = EnemyController.instance.getEnemy(0);
+                enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position);
+                if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(1).transform.position) < 0.1f)
+                {
+                    enemy.currLerpTime = 0f;
+                    chooseDuration.resetTimer();
+                    nextRoundTimer.resetTimer();
+                    roundStarted = false;
+                    EnemyController.instance.resetEnemy(0);
+                    chosenSide = 0;
+                    if (PlayerController.instance.checkStatus(true))
+                    {
+                        game_mode = EGAMEMODES.E_DEATH;
+                    }
+                }
+            }
+            else if (Mathf.Sign(chosenSide) == -1)
+            {
+                EnemyBehaviour enemy = EnemyController.instance.getEnemy(1);
+                enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(2).transform.position);
+                if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(2).transform.position) < 0.1f)
+                {
+                    enemy.currLerpTime = 0f;
+                    chooseDuration.resetTimer();
+                    nextRoundTimer.resetTimer();
+                    roundStarted = false;
+                    EnemyController.instance.resetEnemy(1);
+                    chosenSide = 0;
+                    if (PlayerController.instance.checkStatus(true))
+                    {
+                        game_mode = EGAMEMODES.E_DEATH;
+                    }
+                }
+            }
+        }
+        else
+        {
+            t_instruct.text = chooseDuration.u_secondsPassed.ToString();
+        }
+
+        break;
+            default:
+                if (endGame("You died. Click on panel to try again after 3 seconds."))
+                {
+                    game_mode = EGAMEMODES.E_PUNCHOUTGAME;
+                }
+                t_instruct.text = nextRoundTimer.u_secondsPassed.ToString();
+
+        break;
+    }
 	}
 
     public void startRound()
@@ -85,8 +163,37 @@ public class VRGameManager : MonoBehaviour {
         /// 2nd execution ///
         if (roundStarted)
         {
-            Debug.Log("round start!");
+            t_feedback.text = "Round Started, Get Ready!";
             chooseDuration.startTimingNoRefresh();
         }
+    }
+
+    private bool startGame(string displayTxt)
+    {
+        if (!roundStarted)
+        {
+            nextRoundTimer.startTimingNoRefresh();
+            if (nextRoundTimer.u_runAction)
+            {
+                roundStarted = true;
+                t_feedback.text = displayTxt;
+                return true; // round reset
+            }
+        }
+        return false;
+    }
+
+    private bool endGame(string displayTxt)
+    {
+        t_feedback.text = displayTxt;
+        if (!roundStarted)
+        {
+            nextRoundTimer.startTimingNoRefresh();
+            if (nextRoundTimer.u_runAction)
+            {
+                return true; // round reset
+            }
+        }
+        return false;
     }
 }

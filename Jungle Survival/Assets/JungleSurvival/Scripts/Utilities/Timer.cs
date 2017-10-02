@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Timer : MonoBehaviour{
-    public bool hasStarted;
-    public bool runAction;
-    public int secondsPassed;
-    public int MAX_SECS;
+    public bool u_hasStarted;
+    public bool u_runAction;
+    public int u_secondsPassed;
+    public int u_MAX_SECS;
 
     void Start () {
-        hasStarted = false;
-        secondsPassed = 0;
-        runAction = false;
+        u_hasStarted = false;
+        u_secondsPassed = 0;
+        u_runAction = false;
     }
 
     void Update () {
@@ -21,7 +21,7 @@ public class Timer : MonoBehaviour{
     // Constructor
     public void initTimer(int MAX_SECONDS)
     {
-        MAX_SECS = MAX_SECONDS;
+        u_MAX_SECS = MAX_SECONDS;
     }
 
     /// <summary>
@@ -30,14 +30,14 @@ public class Timer : MonoBehaviour{
     /// <returns></returns>
     private IEnumerator StartCR()
     {
-        while(hasStarted)
+        while(u_hasStarted)
         {
-            ++secondsPassed;
+            ++u_secondsPassed;
             //Debug.Log(secondsPassed);
 
-            if (secondsPassed == MAX_SECS)
+            if (u_secondsPassed == u_MAX_SECS)
             {
-                runAction = true;
+                u_runAction = true;
                 stopTiming();
             }
             yield return new WaitForSeconds(1); // Called again after wait time
@@ -46,33 +46,33 @@ public class Timer : MonoBehaviour{
 
     public void startTiming()
     {
-        if (!hasStarted)
+        if (!u_hasStarted)
         {
-            hasStarted = true;
+            u_hasStarted = true;
             StartCoroutine(StartCR());
         }
         else
-            secondsPassed = 0;
+            u_secondsPassed = 0;
     }
 
     public void startTimingNoRefresh()
     {
-        if (!hasStarted)
+        if (!u_hasStarted)
         {
-            hasStarted = true;
+            u_hasStarted = true;
             StartCoroutine(StartCR());
         }
     }
 
     public void stopTiming()
     {
-        hasStarted = false;
-        secondsPassed = 0;
+        u_hasStarted = false;
+        u_secondsPassed = 0;
         StopCoroutine(StartCR());
     }
 
     public void resetTimer()
     {
-        runAction = false;
+        u_runAction = false;
     }
 }

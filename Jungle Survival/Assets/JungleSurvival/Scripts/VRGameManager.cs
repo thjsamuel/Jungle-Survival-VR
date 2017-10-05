@@ -107,7 +107,8 @@ public class VRGameManager : MonoBehaviour {
             if (Mathf.Sign(chosenSide) == 1)
             {
                 EnemyBehaviour enemy = EnemyController.instance.getEnemy(0);
-                enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position);
+                //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position);
+                enemy.moveMeshBezierCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position, PlayerController.instance.pawn.transform.position);
                 if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(1).transform.position) < 0.1f)
                 {
                     enemy.currLerpTime = 0f;
@@ -120,12 +121,17 @@ public class VRGameManager : MonoBehaviour {
                     {
                         game_mode = EGAMEMODES.E_DEATH;
                     }
+                    else
+                    {
+                        t_feedback.text = "Good job! You dodged it!";
+                    }
                 }
             }
             else if (Mathf.Sign(chosenSide) == -1)
             {
                 EnemyBehaviour enemy = EnemyController.instance.getEnemy(1);
-                enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(2).transform.position);
+                //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(2).transform.position);
+                enemy.moveMeshBezierCurved(PlayerController.instance.pawn.transform.GetChild(2).transform.position, PlayerController.instance.pawn.transform.position, false);
                 if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(2).transform.position) < 0.1f)
                 {
                     enemy.currLerpTime = 0f;
@@ -137,6 +143,10 @@ public class VRGameManager : MonoBehaviour {
                     if (PlayerController.instance.checkStatus(true))
                     {
                         game_mode = EGAMEMODES.E_DEATH;
+                    }
+                    else
+                    {
+                        t_feedback.text = "Good job! You dodged it!";
                     }
                 }
             }

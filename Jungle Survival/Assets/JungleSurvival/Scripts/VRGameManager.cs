@@ -12,9 +12,12 @@ public class VRGameManager : MonoBehaviour {
     private bool roundStarted;
     private const int SIDE1 = 0;
     private const int SIDE2 = 1;
-    private int chosenSide;
+    public int chosenSide;
     public Text t_instruct;
     public Text t_feedback;
+    private RLEnvironment rl_environment;
+    public Text t_rewards;
+    public Text t_trials;
 
     public enum EGAMEMODES
     {
@@ -40,8 +43,9 @@ public class VRGameManager : MonoBehaviour {
         nextRoundTimer.initTimer(3);
         chooseDuration = gameObject.AddComponent<Timer>();
         chooseDuration.initTimer(5);
-        chosenSide = 0;
+        chosenSide = -1;
         game_mode = EGAMEMODES.E_PUNCHOUTGAME;
+        rl_environment = GetComponent<RLEnvironment>();
 	}
 	
 	// Update is called once per frame
@@ -89,22 +93,15 @@ public class VRGameManager : MonoBehaviour {
         {
             startGame("Round Can Start. Click panel to join!");
         }
-        if (chooseDuration.u_runAction)
+        if (chosenSide >= 0)
         {
+            //StartCoroutine(rl_environment.Act());
+            //if (chosenSide )
+            //{
+                //PlayerController.instance.restoreMaxHealth();
+                
+            //}
             if (chosenSide == 0)
-            {
-                PlayerController.instance.restoreMaxHealth();
-
-                int randVal = Random.Range(0, 100);
-                if (randVal <= 49)
-                {
-                    chosenSide = 1;
-                }
-                else
-                    chosenSide = -1;
-            }
-
-            if (Mathf.Sign(chosenSide) == 1)
             {
                 EnemyBehaviour enemy = EnemyController.instance.getEnemy(0);
                 //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position);
@@ -112,22 +109,22 @@ public class VRGameManager : MonoBehaviour {
                 if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(1).transform.position) < 0.1f)
                 {
                     enemy.currLerpTime = 0f;
-                    chooseDuration.resetTimer();
-                    nextRoundTimer.resetTimer();
-                    roundStarted = false;
+                    //chooseDuration.resetTimer();
+                    //nextRoundTimer.resetTimer();
+                    //roundStarted = false;
                     EnemyController.instance.resetEnemy(0);
-                    chosenSide = 0;
-                    if (PlayerController.instance.checkStatus(true))
-                    {
-                        game_mode = EGAMEMODES.E_DEATH;
-                    }
-                    else
-                    {
-                        t_feedback.text = "Good job! You dodged it!";
-                    }
+                    //chosenSide = 0;
+                    //if (PlayerController.instance.checkStatus(true))
+                    //{
+                    //    game_mode = EGAMEMODES.E_DEATH;
+                    //}
+                    //else
+                    //{
+                    //    t_feedback.text = "Good job! You dodged it!";
+                    //}
                 }
             }
-            else if (Mathf.Sign(chosenSide) == -1)
+            else if (chosenSide == 1)
             {
                 EnemyBehaviour enemy = EnemyController.instance.getEnemy(1);
                 //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(2).transform.position);
@@ -135,19 +132,19 @@ public class VRGameManager : MonoBehaviour {
                 if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(2).transform.position) < 0.1f)
                 {
                     enemy.currLerpTime = 0f;
-                    chooseDuration.resetTimer();
-                    nextRoundTimer.resetTimer();
-                    roundStarted = false;
+                    //chooseDuration.resetTimer();
+                    //nextRoundTimer.resetTimer();
+                    //roundStarted = false;
                     EnemyController.instance.resetEnemy(1);
-                    chosenSide = 0;
-                    if (PlayerController.instance.checkStatus(true))
-                    {
-                        game_mode = EGAMEMODES.E_DEATH;
-                    }
-                    else
-                    {
-                        t_feedback.text = "Good job! You dodged it!";
-                    }
+                    //chosenSide = 0;
+                    //if (PlayerController.instance.checkStatus(true))
+                    //{
+                    //    game_mode = EGAMEMODES.E_DEATH;
+                    //}
+                    //else
+                    //{
+                    //    t_feedback.text = "Good job! You dodged it!";
+                    //}
                 }
             }
         }
@@ -205,5 +202,54 @@ public class VRGameManager : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// Check if AI's action is correct
+    /// </summary>
+    /// <param name="act">The action that AI made</param>
+    /// <param return="reward">Reward ranges from (-1, 1)</param>
+    public int GetRewards(int act)
+    {
+        int reward;
+        int n;
+        if (PlayerController.instance.pawn.rotated < 0)
+            n = 0;
+        else if (PlayerController.instance.pawn.rotated > 0)
+            n = (int)rl_environment.parameterlength - 1;
+        else 
+            n = act;
+
+        //Debug.Log("i chose: " + n);
+        //Debug.Log("he chose: " + act);
+        if (n == act)
+        {
+            reward = 1;
+        }
+        else
+            reward = -1;
+        t_rewards.text = "Total rewards: " + rl_environment.totalRewards.ToString();
+        t_trials.text = "Num trials: " + rl_environment.trial.ToString();
+        switch (act)
+        {
+            case 0:
+                chosenSide = 1;
+                break;
+            case 1:
+                chosenSide = 0;
+                break;
+        }
+        rl_environment.trial += 1;
+        StartCoroutine(rl_environment.Act());
+        //StartCoroutine(delaylearning());
+        return reward;
+    }
+
+    IEnumerator delaylearning()
+    {
+        //chosenSide = -1;
+        yield return new WaitForSeconds(0.5f);
+        rl_environment.trial += 1;
+        StartCoroutine(rl_environment.Act());
     }
 }

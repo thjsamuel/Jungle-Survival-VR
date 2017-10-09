@@ -10,14 +10,15 @@ public class VRGameManager : MonoBehaviour {
     private Timer chooseDuration;
     // Gameplay code
     private bool roundStarted;
-    private const int SIDE1 = 0;
-    private const int SIDE2 = 1;
     public int chosenSide;
     public Text t_instruct;
     public Text t_feedback;
-    private RLEnvironment rl_environment;
+    public RLEnvironment rl_environment;
     public Text t_rewards;
     public Text t_trials;
+    private EnemyBehaviour e1;
+    private EnemyBehaviour e2;
+    public bool fistlocked;
 
     public enum EGAMEMODES
     {
@@ -46,6 +47,11 @@ public class VRGameManager : MonoBehaviour {
         chosenSide = -1;
         game_mode = EGAMEMODES.E_PUNCHOUTGAME;
         rl_environment = GetComponent<RLEnvironment>();
+        e1 = EnemyController.instance.getEnemy(0);
+        e2 = EnemyController.instance.getEnemy(1);
+        e1.target = PlayerController.instance.pawn.transform.GetChild(1).transform.position;
+        e2.target = PlayerController.instance.pawn.transform.GetChild(2).transform.position;
+        fistlocked = false;
 	}
 	
 	// Update is called once per frame
@@ -93,64 +99,115 @@ public class VRGameManager : MonoBehaviour {
         {
             startGame("Round Can Start. Click panel to join!");
         }
-        if (chosenSide >= 0)
+        //PlayerController.instance.restoreMaxHealth();
+        if (chosenSide == 0 && e2.reached == false && !e2.bouncing)
         {
-            //StartCoroutine(rl_environment.Act());
-            //if (chosenSide )
-            //{
-                //PlayerController.instance.restoreMaxHealth();
-                
-            //}
-            if (chosenSide == 0)
+            e1.bouncing = false;
+            //e2.moveMeshBezierCurved(e2.target, PlayerController.instance.pawn.transform.position, false);
+            e2.moveMeshCurved(EnemyController.instance.originalPosList[1]);
+            if (Vector3.Distance(e2.transform.position, EnemyController.instance.originalPosList[1]) < 0.1f)
             {
-                EnemyBehaviour enemy = EnemyController.instance.getEnemy(0);
-                //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position);
-                enemy.moveMeshBezierCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position, PlayerController.instance.pawn.transform.position);
-                if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(1).transform.position) < 0.1f)
-                {
-                    enemy.currLerpTime = 0f;
-                    //chooseDuration.resetTimer();
-                    //nextRoundTimer.resetTimer();
-                    //roundStarted = false;
-                    EnemyController.instance.resetEnemy(0);
-                    //chosenSide = 0;
-                    //if (PlayerController.instance.checkStatus(true))
-                    //{
-                    //    game_mode = EGAMEMODES.E_DEATH;
-                    //}
-                    //else
-                    //{
-                    //    t_feedback.text = "Good job! You dodged it!";
-                    //}
-                }
-            }
-            else if (chosenSide == 1)
-            {
-                EnemyBehaviour enemy = EnemyController.instance.getEnemy(1);
-                //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(2).transform.position);
-                enemy.moveMeshBezierCurved(PlayerController.instance.pawn.transform.GetChild(2).transform.position, PlayerController.instance.pawn.transform.position, false);
-                if (Vector3.Distance(enemy.transform.position, PlayerController.instance.pawn.transform.GetChild(2).transform.position) < 0.1f)
-                {
-                    enemy.currLerpTime = 0f;
-                    //chooseDuration.resetTimer();
-                    //nextRoundTimer.resetTimer();
-                    //roundStarted = false;
-                    EnemyController.instance.resetEnemy(1);
-                    //chosenSide = 0;
-                    //if (PlayerController.instance.checkStatus(true))
-                    //{
-                    //    game_mode = EGAMEMODES.E_DEATH;
-                    //}
-                    //else
-                    //{
-                    //    t_feedback.text = "Good job! You dodged it!";
-                    //}
-                }
+                e2.reached = true;
+                e2.currLerpTime = 0f;
+                e2.bouncing = true;
             }
         }
-        else
+        if (chosenSide == 1 && e1.reached == false && !e1.bouncing)
         {
-            t_instruct.text = chooseDuration.u_secondsPassed.ToString();
+            e2.bouncing = false;
+            //e1.moveMeshCurved(EnemyController.instance.originalPosList[0]);
+            //if (Vector3.Distance(e1.transform.position, EnemyController.instance.originalPosList[0]) < 0.1f)
+            //    e1.reached = true;
+            //e1.moveMeshCurved(e1.target);
+            e1.moveMeshCurved(EnemyController.instance.originalPosList[0]);
+            //e1.moveMeshBezierCurved(e1.target, PlayerController.instance.pawn.transform.position);
+            if (Vector3.Distance(e1.transform.position, EnemyController.instance.originalPosList[1]) < 0.1f)
+            {
+                e1.reached = true;
+                e1.currLerpTime = 0f;
+                e1.bouncing = true;
+            }
+        }
+
+        if (e1.reached)
+        {
+            //e1.moveMeshBezierCurvedReverse(e1.target,EnemyController.instance.originalPosList[0], EnemyController.instance.originalPosList[0]);
+            e1.moveMeshCurved(EnemyController.instance.originalPosList[0]);
+            if (Vector3.Distance(e1.transform.position, EnemyController.instance.originalPosList[0]) < 0.1f)
+            {
+                e1.reached = false;
+                fistlocked = false;
+            }
+        }
+
+        if (e2.reached)
+        {
+            //e2.moveMeshBezierCurvedReverse(e2.target,EnemyController.instance.originalPosList[1], EnemyController.instance.originalPosList[1], false);
+            e2.moveMeshCurved(EnemyController.instance.originalPosList[1]);
+            if (Vector3.Distance(e2.transform.position, EnemyController.instance.originalPosList[1]) < 0.1f)
+            {
+                e2.reached = false;
+                fistlocked = false;
+            }
+        }
+
+        //if (chosenSide == 1)
+        //    if (e1.bouncing)
+        //        e1.bounceMeshBezier(EnemyController.instance.originalPosList[0], EnemyController.instance.originalPosList[0]);
+        //if (chosenSide == 0)
+        //    if (e2.bouncing)
+        //        e2.bounceMeshBezier(EnemyController.instance.originalPosList[1], EnemyController.instance.originalPosList[1], false);
+
+        if (chosenSide == 0 && !e1.reached)
+        {
+            fistlocked = true;
+            //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position);
+            //other_enemy.moveMeshCurved(EnemyController.instance.originalPosList[1]);
+            e1.moveMeshBezierCurved(e1.target, PlayerController.instance.pawn.transform.position);
+            e1.reached = false;
+            if (Vector3.Distance(e1.transform.position, e1.target) < 0.1f)
+            {
+                e1.reached = true;
+                e1.currLerpTime = 0f;
+                //chooseDuration.resetTimer();
+                //nextRoundTimer.resetTimer();
+                //roundStarted = false;
+                //EnemyController.instance.resetEnemy(0);
+                //chosenSide = 0;
+                //if (PlayerController.instance.checkStatus(true))
+                //{
+                //    game_mode = EGAMEMODES.E_DEATH;
+                //}
+                //else
+                //{
+                //    t_feedback.text = "Good job! You dodged it!";
+                //}
+            }
+        }
+        else if (chosenSide == 1 && !e2.reached)
+        {
+            fistlocked = true;
+            //other_enemy.moveMeshCurved(EnemyController.instance.originalPosList[0]);
+            e2.moveMeshBezierCurved(e2.target, PlayerController.instance.pawn.transform.position, false);
+            e2.reached = false;
+            if (Vector3.Distance(e2.transform.position, e2.target) < 0.1f)
+            {
+                e2.reached = true;
+                e2.currLerpTime = 0f;
+                //chooseDuration.resetTimer();
+                //nextRoundTimer.resetTimer();
+                //roundStarted = false;
+                //EnemyController.instance.resetEnemy(1);
+                //chosenSide = 0;
+                //if (PlayerController.instance.checkStatus(true))
+                //{
+                //    game_mode = EGAMEMODES.E_DEATH;
+                //}
+                //else
+                //{
+                //    t_feedback.text = "Good job! You dodged it!";
+                //}
+            }
         }
 
         break;

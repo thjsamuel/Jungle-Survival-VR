@@ -28,7 +28,7 @@ public class RLEnvironment : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        actSpeed = 0.5f;
+        actSpeed = 1.4f;
         //if (Input.GetKeyDown(KeyCode.Escape))
         //{
         //    Application.Quit();
@@ -48,7 +48,8 @@ public class RLEnvironment : MonoBehaviour {
     {
         yield return new WaitForSeconds(actSpeed); // wait for actSpeed seconds
         int action = agent.PickAction();
-        VRGameManager.instance.chosenSide = action;
+        if (VRGameManager.instance.fistlocked == false)
+            VRGameManager.instance.chosenSide = action;
         float reward = VRGameManager.instance.GetRewards(action);
         totalRewards += reward;
         agent.UpdatePolicy(action, reward);

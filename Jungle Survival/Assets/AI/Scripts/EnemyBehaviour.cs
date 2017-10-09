@@ -4,11 +4,21 @@ using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour {
     public float currLerpTime;
+    public float bounceLerpTime1;
+    public float bounceLerpTime2;
+    public bool bounce1;
+    public bool bounce2;
+    public bool bouncing;
     public float lerpTime = 1f;
+    public bool reached;
+    public Vector3 target;
 	// Use this for initialization
 	void Start () {
-        currLerpTime = 0;
+        currLerpTime = bounceLerpTime1 = bounceLerpTime2 = 0;
         lerpTime = 1f;
+        reached = true;
+
+        bounce1 = bounce2 = true;
 	}
 	
 	// Update is called once per frame
@@ -28,14 +38,18 @@ public class EnemyBehaviour : MonoBehaviour {
         journeyLength = 1 / journeyLength;
         //journeyLength *= Time.deltaTime;
         journeyLength = Mathf.Sin(journeyLength * Mathf.PI * (Time.deltaTime * 5));
-        transform.position = Vector3.Lerp(transform.position, targetPos, journeyLength);
+        if (journeyLength > 0)
+            transform.position = Vector3.Lerp(transform.position, targetPos, journeyLength);
+        else
+            transform.position = Vector3.Lerp(transform.position, targetPos, 1);
     }
 
     public void moveMeshBezierCurved(Vector3 finalPos, Vector3 midPos, bool dir = true)
     {
+        float slowmospeed = Time.deltaTime / VRGameManager.instance.rl_environment.actSpeed;
         if (dir)
         {
-            currLerpTime += Time.deltaTime;
+            currLerpTime += slowmospeed;
             if (currLerpTime > lerpTime)
                 currLerpTime = lerpTime;
             //float journeyLength = Vector3.Distance(transform.position, finalPos);
@@ -57,12 +71,108 @@ public class EnemyBehaviour : MonoBehaviour {
         }
         else
         {
-            currLerpTime += Time.deltaTime;
+            currLerpTime += slowmospeed;
             if (currLerpTime > lerpTime)
                 currLerpTime = lerpTime;
             Vector3 secondPos = new Vector3(midPos.x - 1, midPos.y, midPos.z + 2);
             Vector3 thirdPos = new Vector3(midPos.x - 5, midPos.y, midPos.z + 3);
             Vector3 curvePoint = GetPointOnBezierCurve(EnemyController.instance.originalPosList[1], secondPos, thirdPos, finalPos, currLerpTime, true);
+            transform.position = curvePoint;
+        }
+    }
+
+    public void moveMeshBezierCurvedReverse(Vector3 startPos, Vector3 finalPos, Vector3 midPos, bool dir = true)
+    {
+        float slowmospeed = Time.deltaTime / VRGameManager.instance.rl_environment.actSpeed;
+        if (dir)
+        {
+            currLerpTime += slowmospeed;
+            if (currLerpTime > lerpTime)
+                currLerpTime = lerpTime;
+            //float journeyLength = Vector3.Distance(transform.position, finalPos);
+            //journeyLength = (1 / journeyLength);
+            //journeyLength = 1 / (1 - journeyLength * Time.deltaTime);
+            Vector3 secondPos = new Vector3(midPos.x - 1, midPos.y, midPos.z - 2);
+            Vector3 thirdPos = new Vector3(midPos.x - 5, midPos.y, midPos.z - 3);
+            Vector3 curvePoint = GetPointOnBezierCurve(startPos, secondPos, thirdPos, finalPos, currLerpTime, true);
+            transform.position = curvePoint;
+            //if (currLerpTime < lerpTime)
+            //{
+            //    GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //    GameObject temp2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //    GameObject temp3 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //    temp.transform.position = secondPos;
+            //    temp2.transform.position = thirdPos;
+            //    temp3.transform.position = curvePoint;
+            //}
+        }
+        else
+        {
+            currLerpTime += slowmospeed;
+            if (currLerpTime > lerpTime)
+                currLerpTime = lerpTime;
+            Vector3 secondPos = new Vector3(midPos.x - 1, midPos.y, midPos.z + 2);
+            Vector3 thirdPos = new Vector3(midPos.x - 5, midPos.y, midPos.z + 3);
+            Vector3 curvePoint = GetPointOnBezierCurve(startPos, secondPos, thirdPos, finalPos, currLerpTime, true);
+            transform.position = curvePoint;
+        }
+    }
+
+    public void bounceMeshBezier(Vector3 finalPos, Vector3 midPos, bool dir = true)
+    {
+        float slowmospeed = Time.deltaTime / VRGameManager.instance.rl_environment.actSpeed;
+        if (dir)
+        {
+            if (bounce1 == true)
+                bounceLerpTime1 += slowmospeed;
+            else
+                bounceLerpTime1 -= slowmospeed;
+            if (bounceLerpTime1 > lerpTime)
+            {
+                bounceLerpTime1 = lerpTime;
+                bounce1 = false;
+            }
+            else if (bounceLerpTime1 < 0)
+            {
+                bounceLerpTime1 = 0;
+                bounce1 = true;
+            }
+            //float journeyLength = Vector3.Distance(transform.position, finalPos);
+            //journeyLength = (1 / journeyLength);
+            //journeyLength = 1 / (1 - journeyLength * Time.deltaTime);
+            Vector3 secondPos = new Vector3(midPos.x - 1, midPos.y + 3, midPos.z - 2);
+            Vector3 thirdPos = new Vector3(midPos.x - 5, midPos.y + 3, midPos.z - 3);
+            Vector3 curvePoint = GetPointOnBezierCurve(EnemyController.instance.originalPosList[0], thirdPos, secondPos, EnemyController.instance.originalPosList[0], bounceLerpTime1, true);
+            transform.position = curvePoint;
+            //if (currLerpTime < lerpTime)
+            //{
+            //    GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //    GameObject temp2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //    GameObject temp3 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //    temp.transform.position = secondPos;
+            //    temp2.transform.position = thirdPos;
+            //    temp3.transform.position = curvePoint;
+            //}
+        }
+        else
+        {
+            if (bounce2 == true)
+                bounceLerpTime2 += slowmospeed;
+            else
+                bounceLerpTime2 -= slowmospeed;
+            if (bounceLerpTime2 > lerpTime)
+            {
+                bounceLerpTime2 = lerpTime;
+                bounce2 = false;
+            }
+            else if (bounceLerpTime2 < 0)
+            {
+                bounceLerpTime2 = 0;
+                bounce2 = true;
+            }
+            Vector3 secondPos = new Vector3(midPos.x - 1, midPos.y + 3, midPos.z + 2);
+            Vector3 thirdPos = new Vector3(midPos.x - 5, midPos.y + 3, midPos.z + 3);
+            Vector3 curvePoint = GetPointOnBezierCurve(EnemyController.instance.originalPosList[1], thirdPos, secondPos, EnemyController.instance.originalPosList[1], bounceLerpTime2, true);
             transform.position = curvePoint;
         }
     }

@@ -10,7 +10,7 @@ public class RLAgent {
     // The vector containing the cost function values for each possible choice/hypothesis, j(action)
     public float[] value_table; 
     // The rate at which to update the value estimates given a reward. It is small so that it does not jump over the best(least) cost parameter for performing a state/action
-    float learning_rate = 0.05f; // Learning speed depends on learning rate
+    float learning_rate = 0.01f; // Learning speed depends on learning rate
 
     /// <summary>
 	/// Initializes a new instance of the <see cref="Agent"/> class.
@@ -42,7 +42,7 @@ public class RLAgent {
     public void UpdatePolicy(int action, float reward)
     {
         value_table[action] += learning_rate * (reward - value_table[action]);
-        Debug.Log(value_table[action]);
+        //Debug.Log(value_table[action]);
     }
 
     public void UpdateGradientDescent(int action, float reward)

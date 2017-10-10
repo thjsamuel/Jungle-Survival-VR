@@ -61,8 +61,7 @@ public class ALLInputManager : MonoBehaviour  {
 
     public Vector3 MoveBezierCurve2d(Vector3 startPos, Vector3 secPos, Vector3 thirdPos, Vector3 finalPos, float lerptime, float dir)
     {
-        float speed = Time.deltaTime * dir;
-        lerptime += speed;
+        lerptime += dir;
         if (lerptime > 1)
             lerptime = 1;
         if (lerptime < 0)
@@ -95,6 +94,44 @@ public class ALLInputManager : MonoBehaviour  {
             (t3) * p3;
 
         return result;
+    }
+
+    public Vector3 moveCurve(Vector3 originalpos, Vector3 targetPos, float lerptime)
+    {
+        //currLerpTime += Time.deltaTime;
+        //if (currLerpTime > lerpTime)
+        //{
+        //    currLerpTime = lerpTime;
+        //}
+        lerptime *= Time.deltaTime;
+        Mathf.Clamp(lerptime, 0, 1);
+        //float journeyLength = Vector3.Distance(transform.position, targetPos);
+        //float t = currLerpTime / lerpTime;
+        //journeyLength = 1 / journeyLength;
+        //journeyLength *= Time.deltaTime;
+        //journeyLength = Mathf.Sin(journeyLength * Mathf.PI * (Time.deltaTime * 5));
+        //if (journeyLength > 0)
+        return Vector3.Lerp(originalpos, targetPos, lerptime);
+        //else
+            //transform.position = Vector3.Lerp(transform.position, targetPos, 1);
+    }
+
+    /// <summary>
+    /// Get quadratic bezier curve point
+    /// </summary>
+    /// <param name="p0"></param>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
+    /// <param name="t"></param>
+    /// <returns>Vec3 curve point</returns>
+    public Vector3 GetPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+    {
+        t = Mathf.Clamp01(t);
+        float oneMinusT = 1f - t;
+        return
+            oneMinusT * oneMinusT * p0 +
+            2f * oneMinusT * t * p1 +
+            t * t * p2;
     }
 
 }

@@ -1,0 +1,8 @@
+A Game Mode class, needs to have a elapsed time of game mode
+Timer elapsedTime
+A difficulty system
+Enum difficulty
+float projectileSpd
+A penalty system
+bool isplayerhit
+go back by one difficulty if hit

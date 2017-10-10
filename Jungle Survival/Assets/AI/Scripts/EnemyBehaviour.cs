@@ -26,6 +26,12 @@ public class EnemyBehaviour : MonoBehaviour {
 		
 	}
 
+    public void resetAttributes()
+    {
+        currLerpTime = 0;
+        reached = true;
+    }
+
     public void moveMeshCurved(Vector3 targetPos)
     {
         //currLerpTime += Time.deltaTime;

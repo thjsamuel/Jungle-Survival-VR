@@ -9,6 +9,18 @@ public class RLEnvironment : MonoBehaviour {
     public float actSpeed; // Speed at which actions are chosen.
     float[] armProbs; // True values for each chests in each room.
     RLAgent agent; // The agent which learns to pick actions.
+    bool startedAgent;
+    public float accLearnRate
+    {
+        get
+        {
+            return agent.learning_rate;
+        }
+        set
+        {
+            agent.learning_rate += value;
+        }
+    }
     public float parameterlength;
    
     /// <summary>
@@ -16,19 +28,33 @@ public class RLEnvironment : MonoBehaviour {
 	/// </summary>
     public void BeginLearning()
     {
-        trial = 0;
-        totalRewards = 0;
-        num_combos = 2;
-        bool optimistic = true;//GameObject.Find("optToggle").GetComponent<Toggle>().isOn;
+        if (!startedAgent)
+        {
+            trial = 0;
+            totalRewards = 0;
+            num_combos = 2;
+            bool optimistic = true;//GameObject.Find("optToggle").GetComponent<Toggle>().isOn;
 
-        agent = new RLAgent(num_combos, optimistic);
-        parameterlength = agent.value_table.Length;
+            agent = new RLAgent(num_combos, optimistic);
+            parameterlength = agent.value_table.Length;
+            startedAgent = true;
+            StartCoroutine(Act());
+        }
+    }
+
+    public void PauseLearning()
+    {
+        StopCoroutine(Act());
+    }
+
+    public void ResumeLearning()
+    {
         StartCoroutine(Act());
     }
 
 	// Use this for initialization
 	void Start () {
-        actSpeed = 1.4f;
+        actSpeed = 3f;
         //if (Input.GetKeyDown(KeyCode.Escape))
         //{
         //    Application.Quit();

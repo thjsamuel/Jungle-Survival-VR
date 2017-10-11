@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
     public static PlayerController instance = null;
@@ -9,6 +10,11 @@ public class PlayerController : MonoBehaviour {
     public bool isStaringAtSomething;
     private float health; 
     private float max_health;
+    public Slider u_healthbar;
+    private RectTransform t_barTransform;
+    private float barwidth;
+    private Color barcolor;
+    private Transform t_canvas;
 
     void Awake()
     {
@@ -26,11 +32,16 @@ public class PlayerController : MonoBehaviour {
         isStaringAtSomething = false;
         pawn = GameObject.Find("Main Camera").GetComponent<Player>();
         max_health = health = 100;
+        t_barTransform = u_healthbar.GetComponent<RectTransform>();
+        barwidth = t_barTransform.sizeDelta.x / max_health;
+        barcolor = u_healthbar.transform.GetChild(0).GetComponent<Image>().color;
+        t_canvas = u_healthbar.transform.parent;
     }
 	
 	// Update is called once per frame
 	void Update () {
-	    
+	    //t_barTransform.sizeDelta = new Vector3(t_barTransform.sizeDelta.x, )
+        //t_canvas.eulerAngles = new Vector3(0, t_canvas.eulerAngles.y, t_canvas.eulerAngles.z);
 	}
 
     public void ResetStaring()
@@ -43,7 +54,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (other.gameObject.transform.CompareTag("EnemyModel"))
         {
-            decreaseHealth(100);
+            decreaseHealth(20);
         }
     }
 
@@ -55,6 +66,8 @@ public class PlayerController : MonoBehaviour {
     {
         if (health > 0)
             health -= damage;
+        t_barTransform.sizeDelta = new Vector2(t_barTransform.sizeDelta.x - barwidth * damage, t_barTransform.sizeDelta.y);
+        u_healthbar.transform.GetChild(0).GetComponent<Image>().color = Color.Lerp(Color.red, barcolor, health / max_health); // normalize formula, x - min / max - min;
     }
 
     /// <summary>
@@ -77,5 +90,8 @@ public class PlayerController : MonoBehaviour {
     public void restoreMaxHealth()
     {
         health = max_health;
+        t_barTransform.sizeDelta = new Vector2(max_health * barwidth, t_barTransform.sizeDelta.y);
+        u_healthbar.transform.GetChild(0).GetComponent<Image>().color = barcolor;
+
     }
 }

@@ -20,6 +20,8 @@ public class VRGameManager : MonoBehaviour {
     private EnemyBehaviour e2;
     public bool fistlocked;
     private VRGameMode gm_survival;
+    private int randint;
+    private Vector3 lastseen;
 
     public enum EGAMEMODES
     {
@@ -56,6 +58,8 @@ public class VRGameManager : MonoBehaviour {
         e2.target = new Vector3(enemytarget2.x, enemytarget2.y + 1f, enemytarget2.z);
         fistlocked = false;
         gm_survival = gameObject.AddComponent<VRGameMode>();
+        lastseen = PlayerController.instance.pawn.transform.position;
+        randint = 0;
 	}
 	
 	// Update is called once per frame
@@ -113,8 +117,7 @@ public class VRGameManager : MonoBehaviour {
                 e2.moveMeshCurved(EnemyController.instance.originalPosList[1]);
                 if (Vector3.Distance(e2.transform.position, EnemyController.instance.originalPosList[1]) < 0.1f)
                 {
-                    e2.reached = true;
-                    e2.currLerpTime = 0f;
+                    e2.resetAttributes();
                     e2.bouncing = true;
                 }
             }
@@ -129,8 +132,7 @@ public class VRGameManager : MonoBehaviour {
                 //e1.moveMeshBezierCurved(e1.target, PlayerController.instance.pawn.transform.position);
                 if (Vector3.Distance(e1.transform.position, EnemyController.instance.originalPosList[0]) < 0.1f)
                 {
-                    e1.reached = true;
-                    e1.currLerpTime = 0f;
+                    e1.resetAttributes();
                     e1.bouncing = true;
                 }
             }
@@ -167,39 +169,47 @@ public class VRGameManager : MonoBehaviour {
             if (chosenSide == 0 && !e1.reached)
             {
                 fistlocked = true;
-                //enemy.moveMeshCurved(PlayerController.instance.pawn.transform.GetChild(1).transform.position);
-                //other_enemy.moveMeshCurved(EnemyController.instance.originalPosList[1]);
-                e1.moveMeshBezierCurved(e1.target, PlayerController.instance.pawn.transform.position);
+                if (randint == 0)
+                    e1.moveMeshBezierCurved(e1.target, PlayerController.instance.pawn.transform.position);
+                else
+                    e1.transform.position = Vector3.MoveTowards(e1.transform.position, lastseen, (17 *Time.deltaTime) / rl_environment.actSpeed);
                 e1.reached = false;
                 if (Vector3.Distance(e1.transform.position, e1.target) < 0.1f)
                 {
-                    e1.reached = true;
-                    e1.currLerpTime = 0f;
-                    //chooseDuration.resetTimer();
-                    //nextRoundTimer.resetTimer();
-                    //roundStarted = false;
-                    //EnemyController.instance.resetEnemy(0);
-                    //chosenSide = 0;
-                    //if (PlayerController.instance.checkStatus(true))
-                    //{
-                    //    game_mode = EGAMEMODES.E_DEATH;
-                    //}
-                    //else
-                    //{
-                    //    t_feedback.text = "Good job! You dodged it!";
-                    //}
+                    e1.resetAttributes();
+                    randint = Random.Range(0, 2);
+                    lastseen = PlayerController.instance.pawn.transform.position;
+
+
+                }
+                else if (Vector3.Distance(e1.transform.position, lastseen) < 0.1f)
+                {
+                    e1.resetAttributes();
+                    randint = Random.Range(0, 2);
+                    lastseen = PlayerController.instance.pawn.transform.position;
+
                 }
             }
             else if (chosenSide == 1 && !e2.reached)
             {
                 fistlocked = true;
-                //other_enemy.moveMeshCurved(EnemyController.instance.originalPosList[0]);
+                if (randint == 0)
                 e2.moveMeshBezierCurved(e2.target, PlayerController.instance.pawn.transform.position, false);
+                                else
+                    e2.transform.position = Vector3.MoveTowards(e2.transform.position, lastseen, (17 *Time.deltaTime) / rl_environment.actSpeed);
                 e2.reached = false;
                 if (Vector3.Distance(e2.transform.position, e2.target) < 0.1f)
                 {
-                    e2.reached = true;
-                    e2.currLerpTime = 0f;
+                    e2.resetAttributes();
+                    randint = Random.Range(0, 2);
+                    lastseen = PlayerController.instance.pawn.transform.position;
+                }
+                else if (Vector3.Distance(e2.transform.position, lastseen) < 0.1f)
+                {
+                    e2.resetAttributes();
+                    randint = Random.Range(0, 2);
+                    lastseen = PlayerController.instance.pawn.transform.position;
+
                 }
             }
             if (gm_survival.hasRoundEnded())
@@ -218,7 +228,7 @@ public class VRGameManager : MonoBehaviour {
             }
             else if (PlayerController.instance.checkStatus(true))
             {
-                Debug.Log("shai");
+                //Debug.Log("shai");
                 nextRoundTimer.resetTimer();
                 roundStarted = false;
                 EnemyController.instance.resetEnemy(0);
@@ -254,7 +264,7 @@ public class VRGameManager : MonoBehaviour {
             gm_survival.startGameCountdown();
             if (gm_survival.e_gamestate == VRGameMode.E_Gamestate.e_win)
             {
-                PlayerController.instance.restoreMaxHealth();
+                //PlayerController.instance.restoreMaxHealth();
                 gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_inprogress;
                 gm_survival.raiseDifficulty(ref rl_environment.actSpeed, 0.8f);
             }

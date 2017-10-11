@@ -28,7 +28,7 @@ public class Player : MonoBehaviour {
     public int rotated;
     float lean_threshold;
     bool walking;
-    Vector3 origin;
+    public Vector3 origin;
     Vector3 lean_pos;
     private float lerptime;
     Vector3 originleft;
@@ -148,7 +148,7 @@ public class Player : MonoBehaviour {
         {
             Vector3 temp = Input.acceleration;
             temp.Normalize();
-            Vector3 curvepoint = ALLInputManager.instance.GetPoint(originleft, transform.GetChild(3).transform.position, originright, 0.5f);
+            Vector3 curvepoint = ALLInputManager.instance.GetPoint(originleft, transform.GetChild(3).transform.position, originright, 0.8f);
             go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, curvepoint, 6 * Time.deltaTime);
             //go_head.transform.position = ALLInputManager.instance.MoveBezierCurve2d(originleft, , originleft, originright, lerptime, (ALLInputManager.instance.GetDeviceRotation() + 5) * Time.deltaTime);
            /// GameObject gg = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -160,7 +160,7 @@ public class Player : MonoBehaviour {
         }
         else if (rotated == 0 && (WrapAngle(transform.rotation.eulerAngles.z) >= lean_threshold))
         {
-            Vector3 curvepoint = ALLInputManager.instance.GetPoint(originright, transform.GetChild(3).transform.position, originleft, 0.5f);
+            Vector3 curvepoint = ALLInputManager.instance.GetPoint(originright, transform.GetChild(3).transform.position, originleft, 0.8f);
             go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, curvepoint, 6 * Time.deltaTime);
             //go_head.transform.position = Vector3.MoveTowards(go_head.transform.position, originleft, 9 * Time.deltaTime);
             //if ((Vector3.Distance(origin, go_head.transform.position) < ((ALLInputManager.instance.GetDeviceRotation() + 5) * Time.deltaTime)) && is_peeking)

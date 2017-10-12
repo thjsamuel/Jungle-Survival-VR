@@ -12,6 +12,7 @@ public class EnemyBehaviour : MonoBehaviour {
     public float lerpTime = 1f;
     public bool reached;
     public Vector3 target;
+    public float f_timescale;
 	// Use this for initialization
 	void Start () {
         currLerpTime = bounceLerpTime1 = bounceLerpTime2 = 0;
@@ -19,6 +20,7 @@ public class EnemyBehaviour : MonoBehaviour {
         reached = true;
 
         bounce1 = bounce2 = true;
+        f_timescale = 1;
 	}
 	
 	// Update is called once per frame
@@ -52,7 +54,7 @@ public class EnemyBehaviour : MonoBehaviour {
 
     public void moveMeshBezierCurved(Vector3 finalPos, Vector3 midPos, bool dir = true)
     {
-        float slowmospeed = Time.deltaTime / VRGameManager.instance.rl_environment.actSpeed;
+        float slowmospeed = (Time.deltaTime * f_timescale) / VRGameManager.instance.rl_environment.actSpeed;
         if (dir)
         {
             currLerpTime += slowmospeed;

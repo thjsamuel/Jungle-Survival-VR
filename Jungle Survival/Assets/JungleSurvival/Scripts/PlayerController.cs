@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour {
     public CharacterController pc;
     public Player pawn;
     public bool isStaringAtSomething;
-    private float health; 
+    private float health;
     private float max_health;
     public Slider u_healthbar;
     private RectTransform t_barTransform;
@@ -93,5 +93,12 @@ public class PlayerController : MonoBehaviour {
         t_barTransform.sizeDelta = new Vector2(max_health * barwidth, t_barTransform.sizeDelta.y);
         u_healthbar.transform.GetChild(0).GetComponent<Image>().color = barcolor;
 
+    }
+
+    public bool checkStatus(float value)
+    {
+        if (health < value)
+            return true;
+        return false;
     }
 }

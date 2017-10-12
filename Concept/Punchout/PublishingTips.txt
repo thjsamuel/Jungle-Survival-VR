@@ -1,0 +1,6 @@
+Create a website to store the list of games, webpress
+If you do not have photos for a specific platform,
+ the platform is denied your app, ipad for eg
+Do not request for things such as root access
+If you want to have ads, get the minimum permissions to display apps
+The feature graphic is a very important image for the game

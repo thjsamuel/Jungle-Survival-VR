@@ -172,7 +172,7 @@ public class VRGameManager : MonoBehaviour {
                 if (randint == 0)
                     e1.moveMeshBezierCurved(e1.target, PlayerController.instance.pawn.transform.position);
                 else
-                    e1.transform.position = Vector3.MoveTowards(e1.transform.position, lastseen, (17 *Time.deltaTime) / rl_environment.actSpeed);
+                    e1.transform.position = Vector3.MoveTowards(e1.transform.position, lastseen, (17 * Time.deltaTime) / rl_environment.actSpeed);
                 e1.reached = false;
                 if (Vector3.Distance(e1.transform.position, e1.target) < 0.1f)
                 {
@@ -194,9 +194,9 @@ public class VRGameManager : MonoBehaviour {
             {
                 fistlocked = true;
                 if (randint == 0)
-                e2.moveMeshBezierCurved(e2.target, PlayerController.instance.pawn.transform.position, false);
-                                else
-                    e2.transform.position = Vector3.MoveTowards(e2.transform.position, lastseen, (17 *Time.deltaTime) / rl_environment.actSpeed);
+                    e2.moveMeshBezierCurved(e2.target, PlayerController.instance.pawn.transform.position, false);
+                else
+                    e2.transform.position = Vector3.MoveTowards(e2.transform.position, lastseen, (17 * Time.deltaTime) / rl_environment.actSpeed);
                 e2.reached = false;
                 if (Vector3.Distance(e2.transform.position, e2.target) < 0.1f)
                 {
@@ -242,16 +242,24 @@ public class VRGameManager : MonoBehaviour {
             }
         }
         break;
-            default:
-                if (endGame("You died. Click on panel to try again after 3 seconds."))
-                {
-                    game_mode = EGAMEMODES.E_PUNCHOUTGAME;
-                }
-                t_instruct.text = nextRoundTimer.u_secondsPassed.ToString();
+        //    default:
+        //        if (endGame("You died. Click on panel to try again after 3 seconds."))
+        //        {
+        //            game_mode = EGAMEMODES.E_PUNCHOUTGAME;
+        //        }
+        //        t_instruct.text = nextRoundTimer.u_secondsPassed.ToString();
 
-        break;
+        //break;
     }
 	}
+
+    void FixedUpdate ()
+    {
+        switch (game_mode)
+        {
+
+        }
+    }
 
     public void startRound()
     {
@@ -274,6 +282,7 @@ public class VRGameManager : MonoBehaviour {
                 gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_inprogress;
                 rl_environment.actSpeed = 3f;
             }
+            gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_inprogress;
         }
     }
 

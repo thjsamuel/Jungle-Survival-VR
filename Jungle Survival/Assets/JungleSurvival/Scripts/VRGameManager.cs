@@ -22,6 +22,10 @@ public class VRGameManager : MonoBehaviour {
     private VRGameMode gm_survival;
     private int randint;
     private Vector3 lastseen;
+    // Sound
+    public AudioPlayer a_audioplayer;
+    // background audio source
+    private AudioSource a_soundsource;
 
     public enum EGAMEMODES
     {
@@ -60,6 +64,8 @@ public class VRGameManager : MonoBehaviour {
         gm_survival = gameObject.AddComponent<VRGameMode>();
         lastseen = PlayerController.instance.pawn.transform.position;
         randint = 0;
+        a_audioplayer = GetComponent<AudioPlayer>();
+        a_soundsource = GetComponent<AudioSource>();
 	}
 	
 	// Update is called once per frame
@@ -225,10 +231,13 @@ public class VRGameManager : MonoBehaviour {
                 gm_survival.endRound();
                 gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_win;
                 t_feedback.text = "Nice dodging skills!";
+                a_soundsource.Stop();
             }
             else if (PlayerController.instance.checkStatus(true))
             {
                 //Debug.Log("shai");
+                if (roundStarted)
+                    a_audioplayer.PlayOnceTrack(3);
                 nextRoundTimer.resetTimer();
                 roundStarted = false;
                 EnemyController.instance.resetEnemy(0);
@@ -239,7 +248,13 @@ public class VRGameManager : MonoBehaviour {
                 gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_lose;
                 gm_survival.endRound();
                 t_feedback.text = "You got whacked!";
+                a_soundsource.Stop();
             }
+            //else if (gm_survival.isRoundEnding())
+            //{
+            //    if (!a_audioplayer.isPlayingTrack())
+            //        a_audioplayer.PlayOnceTrack(1, 0.5f);
+            //}
         }
         break;
         //    default:
@@ -275,13 +290,23 @@ public class VRGameManager : MonoBehaviour {
                 //PlayerController.instance.restoreMaxHealth();
                 gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_inprogress;
                 gm_survival.raiseDifficulty(ref rl_environment.actSpeed, 0.8f);
+                a_audioplayer.PlayOnceTrack(0);
+                a_soundsource.Play();
             }
             else if (gm_survival.e_gamestate == VRGameMode.E_Gamestate.e_lose)
             {
                 PlayerController.instance.restoreMaxHealth();
                 gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_inprogress;
                 rl_environment.actSpeed = 3f;
+                a_audioplayer.PlayOnceTrack(0);
+                a_soundsource.Play();
             }
+            else if (gm_survival.e_gamestate == VRGameMode.E_Gamestate.e_pause)
+            {
+                a_audioplayer.PlayOnceTrack(0);
+                a_soundsource.Play();
+            }
+
             gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_inprogress;
         }
     }
@@ -295,6 +320,7 @@ public class VRGameManager : MonoBehaviour {
             {
                 roundStarted = true;
                 t_feedback.text = displayTxt;
+                //gm_survival.e_gamestate = VRGameMode.E_Gamestate.e_pause;
                 return true; // round reset
             }
         }

@@ -55,6 +55,10 @@ public class PlayerController : MonoBehaviour {
         if (other.gameObject.transform.CompareTag("EnemyModel"))
         {
             decreaseHealth(20);
+            if (!VRGameManager.instance.a_audioplayer.isPlayingTrack())
+            {
+                VRGameManager.instance.a_audioplayer.PlayOnceTrack(2);
+            }
         }
     }
 

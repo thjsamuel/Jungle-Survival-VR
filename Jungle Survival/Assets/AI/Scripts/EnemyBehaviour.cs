@@ -13,6 +13,7 @@ public class EnemyBehaviour : MonoBehaviour {
     public bool reached;
     public Vector3 target;
     public float f_timescale;
+    private AudioSource a_source;
 	// Use this for initialization
 	void Start () {
         currLerpTime = bounceLerpTime1 = bounceLerpTime2 = 0;
@@ -21,6 +22,7 @@ public class EnemyBehaviour : MonoBehaviour {
 
         bounce1 = bounce2 = true;
         f_timescale = 1;
+        a_source = GetComponent<AudioSource>();
 	}
 	
 	// Update is called once per frame
@@ -59,7 +61,14 @@ public class EnemyBehaviour : MonoBehaviour {
         {
             currLerpTime += slowmospeed;
             if (currLerpTime > lerpTime)
+            {
                 currLerpTime = lerpTime;
+            }
+            if (currLerpTime > 0.5f)
+            {
+                if (!a_source.isPlaying)
+                    a_source.PlayDelayed(0.5f);
+            }
             //float journeyLength = Vector3.Distance(transform.position, finalPos);
             //journeyLength = (1 / journeyLength);
             //journeyLength = 1 / (1 - journeyLength * Time.deltaTime);
@@ -82,6 +91,11 @@ public class EnemyBehaviour : MonoBehaviour {
             currLerpTime += slowmospeed;
             if (currLerpTime > lerpTime)
                 currLerpTime = lerpTime;
+            if (currLerpTime > 0.5f)
+            {
+                if (!a_source.isPlaying)
+                    a_source.PlayDelayed(0.5f);
+            }
             Vector3 secondPos = new Vector3(midPos.x - 1, midPos.y, midPos.z + 2);
             Vector3 thirdPos = new Vector3(midPos.x - 5, midPos.y, midPos.z + 3);
             Vector3 curvePoint = GetPointOnBezierCurve(EnemyController.instance.originalPosList[1], secondPos, thirdPos, finalPos, currLerpTime, true);
